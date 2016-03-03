@@ -389,7 +389,10 @@ function backProp(connection, val) {
         // Update output weight // current weight + Momentum * nodeB.gradVal * nodeA.activatedVal
         connection.toAddWeight = val * connection.weight * connection.activatedPct; // activatedPct?
         
-        if(connection.weight > 10) {
+        if(connection.weight > 10 && connection.toAddWeight > 0) {
+            connection.toAddWeight = 0;
+            
+            
             dataArr.push(connection.weight);
             dataArr2.push(neurons[7].activatedVal);
             dataArr3.push(neurons[8].activatedVal);
@@ -474,7 +477,7 @@ function trainNodes(input, target) {
         
         // console.log(currentTick);
         
-        if(currentTick % 100 == 0) {
+        if(currentTick % 1000 == 0) {
             console.log(currentTick)
             console.log(connections[0].weight + " & " + connections[1].weight)
             console.log(neurons[7].activatedVal + " & " + neurons[7].gradientVal)
@@ -503,7 +506,7 @@ function test(input, expectedVal) {
 		
 		drawSystem();	
 		
-		document.getElementById('output').innerText = neurons[3].activatedVal.toString();
+		document.getElementById('output').innerText = neurons[8].activatedVal.toString();
         
         // Update connection weights
         connections.forEach(function(element) {
@@ -525,7 +528,7 @@ function startRunning() {
     
 }
 
-// Trains the AI and draws the sy
+// Trains the AI and draws the system
 function mainLoop() {
     currentTick++;
     
@@ -538,12 +541,12 @@ function mainLoop() {
         }
 
     // Draws the system
-    if(currentTick % 100 == 0) { 
+    if(currentTick % 1000 == 0) { 
         window.setTimeout(drawSystem, 0); // change the 2nd param to slow/speed up looping
     }
     
     // Loops this function
-    if(currentTick % 100 == 0) {
+    if(currentTick % 1000 == 0) {
         window.requestAnimationFrame(mainLoop);
     } else {
         mainLoop();
