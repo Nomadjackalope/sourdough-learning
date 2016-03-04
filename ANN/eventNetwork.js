@@ -2,7 +2,7 @@ var activationLimit = 0.4;  // Limit is determined by ...
 var gradientLimit = 0.0005; // Limit is determined by ...
 //var neuronPctLimit = 0.5; // Limit is determined by ...
 var startTime = Date.now();
-var runtime = 200; // in milliseconds
+var runtime = 300; // in milliseconds
 //var timeReduxConst = 10000; // in milliseconds
 
 
@@ -359,10 +359,13 @@ function beginningNeuronBackProp(neuronsOut, error) {
         
         //if(neuronsOut[i].gradientVal > gradientLimit) {
             
+            // I don't really know what dsigmoid does
             neuronsOut[i].gradientVal = dsigmoid(neuronsOut[i].activatedVal) * error[i];
             
+            // Makes sure the gradient is not outside -1 to 1
             neuronsOut[i].gradientVal = sigmoidNeg(neuronsOut[i].gradientVal);
             
+            // For all the outputs send their errors
             neuronsOut[i].connectionsIn.forEach(function(element) {
                 
                 backProp(element, neuronsOut[i].gradientVal)
@@ -388,7 +391,7 @@ function backProp(connection, val) {
         
         // Update output weight // current weight + Momentum * nodeB.gradVal * nodeA.activatedVal
         connection.toAddWeight = val * connection.weight * connection.activatedPct; // activatedPct?
-        
+             
         if(connection.weight > 10 && connection.toAddWeight > 0) {
             connection.toAddWeight = 0;
             
@@ -400,7 +403,7 @@ function backProp(connection, val) {
         
         
         //Takes NodeB's gradient val * weight of connection and adds it to its gradient val
-        curNeuron.gradientVal += val * connection.weight * curNeuron.activatedVal;
+        curNeuron.gradientVal += val * connection.weight *curNeuron.activatedVal;
 		
         
         // If the current neuron's gradient has been given a large change the neuron propogates it
@@ -412,14 +415,24 @@ function backProp(connection, val) {
             // Constrains the value to -1 to 1
             curNeuron.gradientVal = sigmoidNeg(curNeuron.gradientVal);
             
+            var weightsOActiveCons = 0; // Total weights of activated input connections
+            
+            // Sums all activated input connections's weights
+            curNeuron.connectionsIn.forEach(function(con) {
+                if(con.activatedPct > 0) {
+                    weightsOActiveCons += con.weight;
+                }
+            }, this);
+            
+            
             // Backprop inputs
             while(curNeuron.numConnectionsInUsed < curNeuron.connectionsIn.length) {
                 
                 // console.log("conOutUsed: " + curNeuron.numConnectionsOutUsed);
                 // console.log("conOutLen: " + (curNeuron.connectionsOut.length) );
-                
-                backProp(curNeuron.connectionsIn[curNeuron.numConnectionsInUsed], curNeuron.gradientVal);
-                
+                if(connection.activatedPct >= 0) {
+                    backProp(curNeuron.connectionsIn[curNeuron.numConnectionsInUsed], curNeuron.gradientVal);
+                }
                 // Increase connections used
                 curNeuron.numConnectionsInUsed++;
                 
@@ -477,11 +490,11 @@ function trainNodes(input, target) {
         
         // console.log(currentTick);
         
-        if(currentTick % 1000 == 0) {
+        if(currentTick % 1 == 0 && currentTick < 15) {
             console.log(currentTick)
             console.log(connections[0].weight + " & " + connections[1].weight)
             console.log(neurons[7].activatedVal + " & " + neurons[7].gradientVal)
-            //console.log(connections[2].weight + " & " + connections[1].weight)
+            console.log(connections[9].weight + " & " + connections[10].weight)
             console.log(neurons[8].activatedVal + " & " + neurons[8].gradientVal)
            // console.log("---------------------------")
             console.log("")
@@ -541,12 +554,12 @@ function mainLoop() {
         }
 
     // Draws the system
-    if(currentTick % 1000 == 0) { 
+    if(currentTick % 1 == 0 && currentTick < 8) { 
         window.setTimeout(drawSystem, 0); // change the 2nd param to slow/speed up looping
     }
     
     // Loops this function
-    if(currentTick % 1000 == 0) {
+    if(currentTick % 1 == 0 && currentTick < 8 || currentTick % 100 == 0) {
         window.requestAnimationFrame(mainLoop);
     } else {
         mainLoop();
