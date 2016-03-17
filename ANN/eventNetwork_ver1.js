@@ -1,6 +1,6 @@
 var activationLimit = 0.4;  // Limit is determined by ...
-var gradientLimit = 0.00005; // Limit is determined by ...
-var runtime = 3000; // ticks
+var gradientLimit = 0.005; // Limit is determined by ...
+var runtime = 300; // ticks
 
 // Used for timing
 var currentTick = 0;
@@ -106,7 +106,7 @@ var connections = [];
 function project(n1, n2) {
 	
     // Creates a new connection where n1 is nodeA and n2 is nodeB
-    var c = new Connection(n1, n2, (Math.random() + 0.5) / 2); //Math.random());
+    var c = new Connection(n1, n2, Math.random()); //Math.random());
 	
     // connection is added to each Neuron's list of output or input connections (resp. nodeA, nodeB)
     n1.connectionsOut.push(c);
@@ -169,6 +169,12 @@ function init() {
         neurons.push(new Neuron(i));
     }
     
+    // project(neurons[0], neurons[7]);
+    // project(neurons[0], neurons[8]);
+    
+    // project(neurons[1], neurons[7]);
+    // project(neurons[1], neurons[8]);
+    
     // --- Test 2 -----
     project(neurons[0], neurons[3]);
     project(neurons[0], neurons[4]);
@@ -194,6 +200,8 @@ function init() {
     connections.forEach(function (element) {
         console.log(element.weight);
     }, this);
+    
+    console.log(currentTick, connections);
 
 
 }
@@ -272,7 +280,7 @@ function beginningNeuronBackProp(neuronsOut, error) {
 
 function backProp(connection, val) {
     
-    var curNeuron = connection.nodeA;
+        var curNeuron = connection.nodeA;
         
         // Update output weight // current weight + Momentum * nodeB.gradVal * nodeA.activatedVal
         connection.toAddWeight = 1.0 * val * connection.weight * connection.activatedPct;
@@ -312,7 +320,7 @@ function trainNodes(input, target) {
     }, this);
 		
     // Run forward prop
-    beginningNeuronActivation([neurons[0], neurons[1], neurons[2]], input);
+    beginningNeuronActivation([neurons[0], neurons[1]], input);
 		
     // Reset connections
     neurons.forEach(function (element) {
@@ -375,8 +383,11 @@ function startRunning() {
 
 }
 
+window.onkeypress = function() {window.requestAnimationFrame(mainLoop)};
+
 // Trains the AI and draws the system
 function mainLoop() {
+    //debugger    
     currentTick++;
     
     // Runs main loop until 
@@ -388,16 +399,16 @@ function mainLoop() {
         }
 
         // Draws the system
-        if (currentTick % 1000 == 0) {
+        if (currentTick % 1 == 0) {
             window.setTimeout(drawSystem, 0); // change the 2nd param to slow/speed up looping
         }
     
         // Loops this function
-        if (currentTick % 1000 == 0) {
-            window.requestAnimationFrame(mainLoop);
-        } else {
-            mainLoop();
-        }
+        // if (currentTick % 1 == 0) {
+        //     window.requestAnimationFrame(mainLoop);
+        // } else {
+        //     mainLoop();
+        // }
 
     } else {
         drawSystem();
@@ -508,13 +519,18 @@ function updateSystem() {
     for (var i = 0; i < lines.length; i++) {
 
         lines[i].thickness = connections[i].weight * 2;
-
-        lines[i].color = "rgb(0, " + Math.round(255 * connections[i].weight) + ", 0)"
+        
+        // If the connection was back propped to the last tick it will be green
+        if(connections[i].activatedPct == 0) {
+            lines[i].color = "green"
+        } else {
+            lines[i].color = "blue"
+        }
 		
         // There is a weird problem where if thickness is 0 the line gets some unknown value
         if (connections[i].weight < 0.0005) {
             lines[i].thickness = 0.1; // This thickness is visible but not large
-            lines[i].color = "red"
+            //lines[i].color = "red"
         }
     }
 }
