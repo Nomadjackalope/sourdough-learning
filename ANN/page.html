@@ -1,14 +1,17 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<script src='eventNetwork.js'></script>
+		<script src='eventNetwork_ver1.js'></script>
 	</head>
 	<body onload="startRunning();">
+		<p> If the connection was backpropped to on the last tick it will be green <p>
 		<canvas height="500px" width="750px" id="canvas"></canvas>
         <p id="status">Training...</p>
-		<button onclick="test([1,0,0], [1, 0])">Test [1,0,0] = [1, 0]</button>
-		<button onclick="test([0,1,0], [0, 1])">Test [0,1,0] = [0, 1]</button>
-		<p id="output">Activated Value</p>
+		<button onclick="test([1,0,0], [0.5, 0])">Test [1,0,0] = 0.5, 0]</button>
+		<button onclick="test([0,1,0], [1, 1])">Test [0,1,0] = [1, 1]</button>
+		<p>Activated Value</p>
+		<p id="output">#1</p>
+		<p id="output2">#2</p>
         <p id="dataArr">Mydata</p>
         <p id="dataArr2">Mydata</p>
 	</body>
