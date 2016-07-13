@@ -2,6 +2,9 @@ var activationLimit = 0.4;  // Limit is determined by ...
 var gradientLimit = 0.005; // Limit is determined by ...
 var runtime = 300; // ticks
 
+// Custom creation nodes
+var layers = [];
+
 // Used for timing
 var currentTick = 0;
 
@@ -9,6 +12,13 @@ var currentTick = 0;
 var dataArr = [];
 var dataArr2 = [];
 var dataArr3 = [];
+
+// function addNode(x, y) {
+//     while(layers.length < x) {
+//         layers.push(0);
+//     }
+//     layers[x] = y;
+// }
 
 // Neuron
 function Neuron(id) {
@@ -233,7 +243,7 @@ function activate(connection, val) {
         
     // Reduce activatedVal based on time last used and connection's time last used
     // add value*weight calc and * by activated val //Should be the neuron's function
-    curNeuron.activatedVal += val * connection.weight * (1 - connection.activatedPct);
+    curNeuron.activatedVal += val * connection.weight;// * (1 - connection.activatedPct);
         
         
     // If the neuron's inputs have exceeded the activation value the neuron is allowed to active its outputs
@@ -337,9 +347,12 @@ function trainNodes(input, target) {
     connections.forEach(function (element) {
         element.weight += element.toAddWeight;
         element.toAddWeight = 0;
+        element.activatedPct = 0;
     })
         
-    if (false) { //currentTick % 1 == 0 && currentTick < 15) {
+    var disFalse = false;
+        
+    if (disFalse) { //currentTick % 1 == 0 && currentTick < 15) {
         console.log(currentTick)
         // console.log(connections[0].weight + " & " + connections[1].weight)
         // console.log(neurons[7].sigmoidedVal + " & " + neurons[7].dsigmoidedVal)
@@ -365,7 +378,8 @@ function test(input, expectedVal) {
 
         drawSystem();
 
-        document.getElementById('output').innerText = neurons[8].sigmoidedVal.toString();
+        document.getElementById('output').innerText = neurons[7].sigmoidedVal.toString();
+        document.getElementById('output2').innerText = neurons[8].sigmoidedVal.toString();
        
     }
 
@@ -393,7 +407,7 @@ function mainLoop() {
     // Runs main loop until 
     if (currentTick < runtime) {
         if (currentTick % 2 == 0) {  // % 2
-            trainNodes([1, 0, 0], [1, 0]);
+            trainNodes([1, 0, 0], [0.5, 0]);
         } else {
             trainNodes([0, 1, 0], [1, 1]);
         }
@@ -404,11 +418,11 @@ function mainLoop() {
         }
     
         // Loops this function
-        // if (currentTick % 1 == 0) {
-        //     window.requestAnimationFrame(mainLoop);
-        // } else {
-        //     mainLoop();
-        // }
+        if (currentTick % 1 == 0) {
+            window.requestAnimationFrame(mainLoop);
+        } else {
+            mainLoop();
+        }
 
     } else {
         drawSystem();
